@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <item
+        android:showAsAction="ifRoom"
+        android:id="@+id/menu_refresh"
+        android:checkable="false"
+        android:orderInCategory="1"
+      />
+
+    <item
+        android:showAsAction="ifRoom|withText"
+        android:id="@+id/menu_scan"
+        android:title="@string/menu_scan"
+        android:orderInCategory="101"
+        />
+    <item
+        android:showAsAction="ifRoom|withText"
+        android:id="@+id/menu_stop"
+        android:title="@string/menu_stop"
+        android:orderInCategory="102"
+        />
+
+   <!-- <item
+        android:showAsAction="never"
+        android:id="@+id/title1"
+        android:title="@string/title1"
+        android:orderInCategory="102"
+       />-->
+    <!--   <menu>
+     <item
+            android:id="@+id/menu_theme"
+            android:actionProviderClass="android.widget.ShareActionProvider"
+            android:title="更换主题"
+            app:showAsAction="always|withText"
+
+            />
+        <item
+            android:id="@+id/menu_system"
+            android:actionProviderClass="android.widget.ShareActionProvider"
+            android:title="系统设置"
+            app:showAsAction="always|withText"
+            />
+
+    </menu>
+</item>-->
+</menu>
