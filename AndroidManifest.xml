@@ -17,28 +17,35 @@
         android:largeScreens="true"
         android:anyDensity="true"/>
 
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppBaseTheme"
-
         >
         <!--android:uiOptions="splitActionBarWhenNarrow"actionbar换到底部-->
 
         <activity
-            android:name="lucian.com.toney_ble.MainActivity"
+            android:name=".WelcomeActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             >
             <!--android:uiOptions="splitActionBarWhenNarrow"-->
+            <!--设置启动Activity-->
+
+        </activity>
+
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-
 
     </application>
 
