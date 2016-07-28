@@ -14,39 +14,56 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="match_parent"
         android:background="@color/darkslateblue"
         >
         <TextView
             android:layout_width="match_parent"
-            android:layout_height="120dp"
+            android:layout_height="80dp"
             android:id="@+id/bar"
-
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:text="莫等闲，白了少年头，空悲切！"
+            android:textSize="20sp"
+            android:textColor="@color/hotpink"
+            android:textStyle="bold"
             />
         <TextView
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:id="@+id/text_toney"
             android:layout_below="@id/bar"
+
             android:paddingLeft="@dimen/activity_horizontal_margin"
 
             android:text="Toney BLE"
             android:textSize="35sp"
+            android:textColor="@color/lightskyblue"
+            android:textStyle="bold"
             />
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+        <ImageButton
+            android:layout_width="50dp"
+            android:layout_height="50dp"
             android:id="@+id/search_butt"
+
+            android:src="@drawable/myforward"
             android:layout_below="@id/text_toney"
             android:layout_alignRight="@id/text_toney"
-
-            android:background="@drawable/search_32"
-
+            android:scaleType="centerCrop"
             >
+        </ImageButton>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
 
-        </Button>
+            android:layout_below="@id/search_butt"
+            android:background="@drawable/splash2"
+            />
+
 
     </RelativeLayout>
+
+
 
 
    <!-- android:drawableBottom="@mipmap/splash"-->

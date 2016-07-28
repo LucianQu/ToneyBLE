@@ -19,12 +19,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 
-public class WelcomeActivity extends ListActivity {
+public class BlueWelcomeActivity extends ListActivity {
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private Handler mHandler;
     private BluetoothAdapter mBluetoothAdapter;
@@ -41,11 +42,11 @@ public class WelcomeActivity extends ListActivity {
         setContentView(R.layout.activity_main);
        // getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         ActionBar actionBar = getActionBar();
-        //actionBar.setTitle(R.string.title_devices);
+        actionBar.setTitle(R.string.title_devices);
        //getActionBar().setTitle(R.string.title_devices);
         // 通过hilde()和show()方法可以控制actionbar的隐藏和显示
         // ActionBar actionBar = getActionBar();
-        actionBar.hide();
+       // actionBar.hide();
         // actionBar.show();
         mHandler = new Handler(); //创建Handler实例对象
 
@@ -158,6 +159,24 @@ public class WelcomeActivity extends ListActivity {
         scanLeDevice(false);
         mLeDeviceListAdapter.clear();
     }
+
+    @Override
+    protected void onListItemClick(ListView l, View v, int position, long id) {
+        final BleDevice bleDevice = mLeDeviceListAdapter.getDevice(position);
+        if (bleDevice == null)
+            return;
+        BluetoothDevice device = bleDevice.device;
+        final Intent intent = new Intent(BlueWelcomeActivity.this,QppActivity.class);
+        intent.putExtra(QppActivity.EXTRAS_DEVICE_NAME,device.getName());
+        intent.putExtra(QppActivity.EXTRAS_DEVICE_ADDRESS,device.getAddress());
+        if (mScanning) {
+            mBluetoothAdapter.stopLeScan(mLeScanCallBack);
+            mScanning = false;
+        }
+        startActivity(intent);
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // User chose not to enable Bluetooth.
@@ -197,7 +216,7 @@ public class WelcomeActivity extends ListActivity {
         public LeDeviceListAdapter() {
             super();
             mLeDevice = new ArrayList<BleDevice>();
-            mInflater = WelcomeActivity.this.getLayoutInflater();//将layout的xml布局文件实例化为view对象,实现动态加载布局
+            mInflater = BlueWelcomeActivity.this.getLayoutInflater();//将layout的xml布局文件实例化为view对象,实现动态加载布局
         }
 
         public void addDevice(BleDevice device) {
