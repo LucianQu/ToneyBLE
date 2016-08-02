@@ -8,7 +8,30 @@
     <string name="menu_stop">Stop</string>
     <string name="unknown_device">unknown device</string>
     <string name="menu_refresh">refresh</string>
+
+    <!--BlueWelcomeActivity显示按钮-->
+    <string name="title_activity_qpp">BLE Option</string>
     <string name="menu_connect">Connect</string>
     <string name="menu_disconnect">Disconnect</string>
+
+    <string name="label_device_name">Device Name:</string>
+    <string name="label_device_address">Device Address:</string>
+    <string name="label_state">Debug Service:</string>
+    <string name="qpp_support">Supported</string>
+    <string name="qpp_not_support">Not Supported</string>
+    <string name="label_notified">Data Received</string>
+    <string name="label_data_received">Data:</string>
+    <string name="label_data_rate">Data Rate:</string>
+    <string name="label_Bps">Bps</string>
+    <string name="label_data_sent">Data Sent:</string>
+    <string name="label_input">Input:</string>
+    <string name="label_hex">0x</string>
+    <string name="label_input_hint">(0~9,A~F)</string>
+    <string name="text_repeat">Repeat</string>
+    <string name="text_trans_format">Hex</string>
+    <string name="btn_send">Send</string>
+    <string name="btn_stop">Stop</string>
+    <string name="label_version">Version 1.0</string>
+
 
 </resources>

@@ -166,7 +166,7 @@ public class BlueWelcomeActivity extends ListActivity {
         if (bleDevice == null)
             return;
         BluetoothDevice device = bleDevice.device;
-        final Intent intent = new Intent(BlueWelcomeActivity.this,QppActivity.class);
+        final Intent intent = new Intent(this,QppActivity.class);
         intent.putExtra(QppActivity.EXTRAS_DEVICE_NAME,device.getName());
         intent.putExtra(QppActivity.EXTRAS_DEVICE_ADDRESS,device.getAddress());
         if (mScanning) {

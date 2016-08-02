@@ -17,6 +17,7 @@
         android:layout_height="match_parent"
         android:background="@color/darkslateblue"
         >
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="80dp"
@@ -28,37 +29,38 @@
             android:textColor="@color/hotpink"
             android:textStyle="bold"
             />
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:id="@+id/text_toney"
-            android:layout_below="@id/bar"
 
             android:paddingLeft="@dimen/activity_horizontal_margin"
-
             android:text="Toney BLE"
             android:textSize="35sp"
             android:textColor="@color/lightskyblue"
             android:textStyle="bold"
-            />
+            android:layout_below="@+id/bar"
+            android:layout_alignParentStart="true" />
         <ImageButton
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:id="@+id/search_butt"
 
             android:src="@drawable/myforward"
-            android:layout_below="@id/text_toney"
-            android:layout_alignRight="@id/text_toney"
+            android:layout_below="@+id/text_toney"
+            android:layout_alignRight="@+id/text_toney"
             android:scaleType="centerCrop"
             >
         </ImageButton>
+
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
 
-            android:layout_below="@id/search_butt"
+            android:layout_below="@+id/search_butt"
             android:background="@drawable/splash2"
-            />
+            android:id="@+id/textView" />
 
 
     </RelativeLayout>
