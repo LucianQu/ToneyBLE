@@ -1,6 +1,6 @@
 <resources>
-    <string name="app_name">Toney_BLE</string>
-    <string name="title_devices">Toney_BLE</string>
+    <string name="app_name">Tony_BLE</string>
+    <string name="title_devices">Tony_BLE</string>
     <string name="title1">title</string>
     <string name="ble_not_supported">BLE is not supported</string>
     <string name="error_bluetooth_not_supported">Bluetooth is not supported</string>
@@ -19,15 +19,16 @@
     <string name="label_state">Debug Service:</string>
     <string name="qpp_support">Supported</string>
     <string name="qpp_not_support">Not Supported</string>
-    <string name="label_notified">Data Received</string>
-    <string name="label_data_received">Data:</string>
+    <string name="label_notified">------Data_Rx------</string>
+    <string name="label_data_received">Rx:</string>
     <string name="label_data_rate">Data Rate:</string>
     <string name="label_Bps">Bps</string>
-    <string name="label_data_sent">Data Sent:</string>
+    <string name="label_data_sent">------Data_Tx------</string>
     <string name="label_input">Input:</string>
     <string name="label_hex">0x</string>
     <string name="label_input_hint">(0~9,A~F)</string>
     <string name="text_repeat">Repeat</string>
+    <string name="text_counter_def">0</string>
     <string name="text_trans_format">Hex</string>
     <string name="btn_send">Send</string>
     <string name="btn_stop">Stop</string>
