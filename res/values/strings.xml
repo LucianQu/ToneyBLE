@@ -29,6 +29,7 @@
     <string name="label_input_hint">(0~9,A~F)</string>
     <string name="text_repeat">Repeat</string>
     <string name="text_counter_def">0</string>
+    <string name="label_send_pkg_repeat">Times:</string>
     <string name="text_trans_format">Hex</string>
     <string name="btn_send">Send</string>
     <string name="btn_stop">Stop</string>

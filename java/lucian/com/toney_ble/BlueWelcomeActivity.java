@@ -72,7 +72,7 @@ public class BlueWelcomeActivity extends ListActivity {
 
 
         Toast.makeText(this,android.os.Build.MODEL, Toast.LENGTH_SHORT).show();
-        Toast.makeText(this,"Toney welcome to your usage!", Toast.LENGTH_LONG).show();
+        Toast.makeText(this,"Tony welcome to your usage!", Toast.LENGTH_LONG).show();
     }
 
     /**
