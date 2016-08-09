@@ -5,15 +5,19 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
+import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.BluetoothProfile;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.InputFilter;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -62,6 +66,9 @@ public class QppActivity extends Activity{
 
     private long qppRepeatCounter = 0;
 
+    private boolean dataRecvFlag = false;
+    private long qppSumDataReceived = 0;
+    private long qppRecevDataTime = 0;
 
 
     //获取BluetoothManager--->BluetoothAdapter
@@ -84,6 +91,65 @@ public class QppActivity extends Activity{
         }
         return true;
     }
+    /*
+    * handler 是Android中为了处理异步线程更新UI的问题而出现的一个工具,在Android中异步线程是不能够更新UI的,只能在
+    * 主线程中更新UI,handler可以分发Message对象和Runnable对象到主线程中,每个Handler实例,都会绑定到创建它的线程
+    * 中(一般是位于主线程),它的作用有两个:
+    * (1):安排消息或Runnable在某个主线程中某个地方执行;
+    * (2):安排一个动作在不同的线程中执行
+    * Handler中分发消息的一些方法:
+    * post(Runnalbe);postAtTime(Runnable, long);postDelayed(Runnable, long);sendEmptyMessage(int);
+    * sendMessage(Message);sendMessageAtTime(Message, long);sendMessageDelayed(Message, long);
+    * 以上post类方法允许你排列一个Runnable对象到主线程队列中,sendMessage类方法,允许你安排一个带数据的Message
+    * 对象到队列中,等待更新.
+    * 这里的mHandler不会被你自己调用,你所要做的就是向handler中传递消息,然后handler响应你所传递的消息.
+    * handler会有一个消息队列,是根据你出入的消息顺序排列的,handler会依次响应消息队列里面的消息.
+    * 总之:当你想要在异步线程里面更新UI的时候就使用handler
+    * private Handler mHandler = new Handler() {
+    *       public void handleMessage(Message msg) {
+    *           switch (msg.what) {
+    *               case 1:
+    *                   操作;
+    *                   break;
+    *               case 2:
+    *                   break;
+    *           }
+    *       };
+    * }
+    * 大家所用的send方法,其是在工作线程中处理完耗时操作后调用handler的sendMessage(message)把message对象发送给
+    * 主线程,在主线程中重写handlerMessage()方法,判断接收到的消息进行更新UI的操作;
+    * post方法传递的是一个runable对象,更新UI的操作也是在这个runnable的run方法中进行的,也就是说run方法的代码是执
+    * 行在主线程中的,虽然它是写在工作线程中的,主线程在接收到消息后自动执行Runnable的run方法中的代码
+    * */
+    /**
+     *Created at : 2016/8/6 18:11
+     *Description: created a handler,send handler
+     */
+    private Handler handlerSend = new Handler();
+    final Runnable runnableSend = new Runnable() {
+       private void QppSendNextData() {
+           byte[] qppDataSend1 = null;
+           try {
+               qppDataSend1 = editSend.getText().toString().getBytes();
+           } catch (Exception e) {
+               e.printStackTrace();
+           }
+
+           if (!QppApi.chenkInputString(qppDataSend1)) {
+               Log.e(TAG, "qppDataSend1 = input string is illegal!");
+               return;
+           }
+           if (qppDataSend1 == null) {
+               Log.e(TAG, "qppDataSend1 = null!");
+               return;
+           }
+
+       }
+        public void run() {
+            QppSendNextData();
+        }
+    };
+    
     /**
      *
      *@author LucianQu
@@ -104,11 +170,45 @@ public class QppActivity extends Activity{
         return true;
     }
     /**
+     *Created at : 2016/8/6 15:52
+     *Description: disconnect ble service
+     */
+    public void disconnect() {
+        if (mBluetoothAdapter == null || mBluetoothGatt == null) {
+            Log.w("Qn Dbg", "BluetoothAdapter not initialized!");
+            return;
+        }
+        mBluetoothGatt.disconnect();
+    }
+
+    /**
      *discover service
      *@author LucianQu
      *created at 2016/8/5 17:52
      */
     private final BluetoothGattCallback mGattCallback = new BluetoothGattCallback() {
+        @Override
+        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            Log.i(TAG, "onConnectionStateChange : " + status + " newState : " + newState);
+            if (newState == BluetoothProfile.STATE_CONNECTED) {
+                mConnected = true;
+                Log.i(TAG, "Connected to GATT server.");
+                Log.i(TAG, "Attempting to start service discovery :" + mBluetoothGatt.discoverServices());
+
+            }else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+                Log.i(TAG, "Disconnected from GATT server.");
+                clearHandler(handlerQppDataRate, runnableQppDataRate);
+                clearHandler(handlerQppDataRateClear, runnableQppDataRateClear);
+                mConnected = false;
+                dataRecvFlag = false;
+
+            }
+            invalidateOptionsMenu();
+        }
+        /**
+         *Desc:
+         *  通过onConnectionStateChange调用OnServiceDiscovered,来发现服务
+         */
         @Override
         public void onServicesDiscovered(BluetoothGatt gatt, int status) {
             if (QppApi.qppEnable(mBluetoothGatt, uuidQppService, uuidQppCharWrite)) {
@@ -118,7 +218,11 @@ public class QppActivity extends Activity{
                 isInitialize = false;
                 setConnectState(R.string.qpp_not_support);
             }
+        }
 
+        @Override
+        public void onCharacteristicChanged(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+            QppApi.updateValueForNotifition(gatt, characteristic);
         }
     };
 
@@ -130,6 +234,68 @@ public class QppActivity extends Activity{
             }
         });
     }
+
+    private void setQppNotify(final String str) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                textQppNotify.setText(str);//更新UI界面显示
+            }
+        });
+    }
+
+    /**
+     * @createAuthor: LucianQu
+     * @createTime: 2016/8/9 18:17
+     *
+     * @desc:   remove input handler's callback,set handler = null;
+     * @param:  handler, runnable
+     * @return: null
+     */
+    private void clearHandler(Handler handler, Runnable runnable) {
+        if (handler != null) {
+
+            handler.removeCallbacks(runnable);
+            handler = null;
+        }
+    }
+
+    /**
+     *Desc:
+     *
+     */
+    public void close() {
+        if (mBluetoothGatt != null) {
+            mBluetoothGatt.close();
+            mBluetoothGatt = null;
+        }
+    }
+
+    /**
+     * @createAuthor: LucianQu
+     * @createTime: 2016/8/9 18:05
+     *
+     * @desc: 开始一个新的线程,计算传输速率
+     * @param: null
+     * @return: null
+     */
+    final Handler handlerQppDataRate = new Handler();
+    final Runnable runnableQppDataRate = new Runnable() {
+        @Override
+        public void run() {
+            qppRecevDataTime++;
+            textQppDataRate.setText(" " + qppSumDataReceived / qppRecevDataTime + " Bps");
+            dataRecvFlag = false;
+        }
+    };
+
+    final Handler handlerQppDataRateClear = new Handler();
+    final Runnable runnableQppDataRateClear = new Runnable() {
+        @Override
+        public void run() {
+            textQppDataRate.setText("");
+        }
+    };
 
     ///////////////////////////
     /*
@@ -168,7 +334,38 @@ public class QppActivity extends Activity{
             Log.e(TAG,"unable to initialize Bluetooth!");
             finish();
         }
+
+        QppApi.setCallback(new iQppCallback() {
+            @Override
+            public void onQppReceiveData(BluetoothGatt mBluetoothGatt, String qppUUIDForNotifyChar, byte[] qppData) {
+                if (!dataRecvFlag) {
+                    dataRecvFlag = true;
+                    handlerQppDataRate.postDelayed(runnableQppDataRate, 1000);
+                    handlerQppDataRateClear.postDelayed(runnableQppDataRateClear, 5000);
+                }
+
+                setQppNotify("");
+                qppSumDataReceived = qppSumDataReceived + qppData.length;
+                if (QppApi.CheckHex)
+                    setQppNotify(HexBytesUtils.byteAscII2hex_Str(qppData));
+                else
+                    setQppNotify(new String(qppData));//Qpp接收到数据,更新到界面
+            }
+        });
+        //注册一个在按钮状态发生改变时执行的回调函数
+        checkTransFormat.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    QppApi.setCheckHexState(true);
+                }else {
+                    QppApi.setCheckHexState(false);
+                }
+            }
+        });
+
     }
+    ///////////////////////////////////////////
     /*
     * create actionBar
     * */
@@ -213,5 +410,20 @@ public class QppActivity extends Activity{
             invalidateOptionsMenu();
             connect(deviceAddress);
         }
+    }
+    /**
+     * @createAuthor: LucianQu
+     * @createTime: 2016/8/9 18:22
+     *
+     * @desc: Over
+     * @param:
+     * @return:
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        clearHandler(handlerQppDataRate, runnableQppDataRate);
+        clearHandler(handlerQppDataRateClear, runnableQppDataRateClear);
+        close();
     }
 }

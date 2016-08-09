@@ -26,6 +26,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class BlueWelcomeActivity extends ListActivity {
+    private static String TAG = BlueWelcomeActivity.class.getSimpleName();
     private LeDeviceListAdapter mLeDeviceListAdapter;
     private Handler mHandler;
     private BluetoothAdapter mBluetoothAdapter;
@@ -33,6 +34,8 @@ public class BlueWelcomeActivity extends ListActivity {
 
     private static final int REQUEST_ENABLE_BT = 1;
     private static final long SCAN_PERIOD = 10000;//unit:millisecond
+
+
 
 
     @Override
@@ -200,6 +203,7 @@ public class BlueWelcomeActivity extends ListActivity {
             },SCAN_PERIOD);
             mScanning = true;
             mBluetoothAdapter.startLeScan(mLeScanCallBack);
+
         }else {
             mBluetoothAdapter.stopLeScan(mLeScanCallBack);
             mScanning = false;
@@ -284,6 +288,33 @@ public class BlueWelcomeActivity extends ListActivity {
         }
     }
 
+   /* private ScanCallback mScanCallback = new ScanCallback() {
+        @Override
+        public void onBatchScanResults(List<ScanResult> results) {
+            Log.i(TAG, "onBatchScanResults");
+        }
+
+        @Override
+        public void onScanFailed(int errorCode) {
+            Log.i(TAG, "error code is : " + errorCode);
+        }
+
+        @Override
+        public void onScanResult(int callbackType, final ScanResult result) {
+           final BleDevice bleDevice = new BleDevice();
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    bleDevice.device = result.getDevice();
+                    bleDevice.rssi = result.getRssi();
+                    mLeDeviceListAdapter.addDevice(bleDevice);
+                    mLeDeviceListAdapter.notifyDataSetChanged();
+                }
+            });
+        }
+    };
+
+*/
     private BluetoothAdapter.LeScanCallback mLeScanCallBack = new BluetoothAdapter.LeScanCallback() {
         @Override
         public void onLeScan(final BluetoothDevice device,final int rssi, byte[] scanRecord) {
