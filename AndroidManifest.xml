@@ -2,7 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="lucian.com.toney_ble"
     android:versionCode="1"
-    android:versionName="1.0" >
+    android:versionName="1.0"
+    >
 
     <uses-sdk
         android:minSdkVersion="19"
@@ -15,7 +16,7 @@
         android:smallScreens="true"
         android:normalScreens="true"
         android:largeScreens="true"
-        android:anyDensity="true"/>
+        android:anyDensity="true" />
 
 
     <application
@@ -41,17 +42,17 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             >
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
+
         <activity
             android:name=".QppActivity"
-
             android:windowSoftInputMode = "stateHidden"
-
             android:label="@string/title_activity_qpp"
             android:screenOrientation = "portrait" >
             <!--

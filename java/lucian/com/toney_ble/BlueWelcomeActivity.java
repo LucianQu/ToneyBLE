@@ -35,27 +35,29 @@ public class BlueWelcomeActivity extends ListActivity {
     private static final int REQUEST_ENABLE_BT = 1;
     private static final long SCAN_PERIOD = 10000;//unit:millisecond
 
-
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
        // getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         ActionBar actionBar = getActionBar();
         actionBar.setTitle(R.string.title_devices);
-       //getActionBar().setTitle(R.string.title_devices);
+
+        //getActionBar().setTitle(R.string.title_devices);
         // 通过hilde()和show()方法可以控制actionbar的隐藏和显示
         // ActionBar actionBar = getActionBar();
        // actionBar.hide();
         // actionBar.show();
+
         mHandler = new Handler(); //创建Handler实例对象
 
         /*getInfo(this);*/
         //Use this check to determine whether BLE is supported on the device .
         //Then you kan selectively disable BLE-related features
+
         if(!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             Toast.makeText(this, R.string.ble_not_supported, Toast.LENGTH_LONG).show();
             finish();
@@ -72,7 +74,6 @@ public class BlueWelcomeActivity extends ListActivity {
             finish();
             return;
         }
-
 
         Toast.makeText(this,android.os.Build.MODEL, Toast.LENGTH_SHORT).show();
         Toast.makeText(this,"Tony welcome to your usage!", Toast.LENGTH_LONG).show();
@@ -177,6 +178,7 @@ public class BlueWelcomeActivity extends ListActivity {
             mScanning = false;
         }
         startActivity(intent);
+        BlueWelcomeActivity.this.finish();
 
     }
 

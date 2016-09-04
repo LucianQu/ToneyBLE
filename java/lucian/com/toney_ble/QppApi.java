@@ -32,6 +32,7 @@ public class QppApi {
     private static boolean NotifyEnabled = false;
     public static boolean CheckHex = false;
 
+    public static final int qppServerBufferSize = 20;
     /**
      *Created at : 2016/8/8 15:36
      *Description: Callback
@@ -50,19 +51,19 @@ public class QppApi {
     public static void updateValueForNotifition(BluetoothGatt bluetoothGatt,
                                                 BluetoothGattCharacteristic characteristic) {
         if (bluetoothGatt == null || characteristic == null) {
-            Log.e(TAG, "Invalid argument!");
+            Log.e(TAG, "--> Invalid argument!");
             return;
         }
-
+        if (!NotifyEnabled) {
+            Log.e(TAG, "--> The notifyCharacteristic not enabled");
+            return;
+        }
         String strUUIDFornotifyChar = characteristic.getUuid().toString();
         final byte[] qppData = characteristic.getValue();
         if (qppData != null && qppData.length > 0) {
             iQppCallback.onQppReceiveData(bluetoothGatt, strUUIDFornotifyChar, qppData);
         }
     }
-
-
-
 
     private static void resetQppField() {
         arrayNtfCharList.clear();
@@ -82,13 +83,13 @@ public class QppApi {
         }
 
         if (bluetoothGatt ==null || qppServiceUUID.isEmpty() ||wtriteCharUUID.isEmpty()) {
-            Log.e(TAG,"invalid arguments");
+            Log.e(TAG,"--> invalid arguments");
             return false;
         }
 
         BluetoothGattService qppService = bluetoothGatt.getService(UUID.fromString(qppServiceUUID));
         if (qppService == null) {
-            Log.e(TAG,"qppService not found!");
+            Log.e(TAG,"--> qppService not found!");
             return false;
         }
 
@@ -119,7 +120,7 @@ public class QppApi {
     private static boolean setCharacteristicNotification(BluetoothGatt bluetoothGatt
             , BluetoothGattCharacteristic characteristic, boolean enabled) {
         if (bluetoothGatt == null) {
-            Log.w(TAG,"BluetoothAdapter not initialized!");
+            Log.w(TAG,"--> BluetoothAdapter not initialized!");
             return false;
         }
         bluetoothGatt.setCharacteristicNotification(characteristic, enabled);
@@ -129,7 +130,7 @@ public class QppApi {
                 descriptor.setValue(BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE);
                 return (bluetoothGatt.writeDescriptor(descriptor));
             }else {
-                Log.e(TAG, "descriptor is null!");
+                Log.e(TAG, "--> descriptor is null!");
                 return false;
             }
         } catch (Exception e) {
@@ -183,7 +184,7 @@ public class QppApi {
        // mbytes = bytes.toString().split(" ").toString().getBytes();
         if (mbytes == null)
             return false;
-        Log.i("Qn Dbg", "mBytes[].length : " + mbytes.length);
+        Log.i("Qn Dbg", "--> mBytes[].length : " + mbytes.length);
 
        do {
            int checkChar = HexStr.indexOf(mbytes[i]);
@@ -201,9 +202,85 @@ public class QppApi {
     public static boolean qppSendData(BluetoothGatt bluetoothGatt, byte[] qppData) {
         boolean ret = false;
         if (bluetoothGatt == null) {
-
+            Log.e(TAG, "--> BluetoothAdapter not initialized ");
+            return false;
+        }
+        int len = qppData.length;
+        if (len <= qppServerBufferSize) {
+            return writeValue(bluetoothGatt, writeCharacteristic, qppData);
+        }else {
+            int count = 0;
+            int offset = 0;
+            while (offset < len) {
+                if ((len - offset) < qppServerBufferSize) {
+                    count = len - offset;
+                }else {
+                    count = qppServerBufferSize;
+                }
+                byte temArray[] = new byte[count];
+                System.arraycopy(qppData, offset, temArray, 0, count);
+                ret = writeValue(bluetoothGatt, writeCharacteristic, temArray);
+                if (!ret)
+                    return ret;
+                offset = offset + count;
+            }
         }
         return true;
+    }
+
+    public static boolean setQppNextNotify(BluetoothGatt bluetoothGatt, boolean EnableNotifyChara) {
+        if (notifyCharIndex == arrayNtfCharList.size()) {
+            NotifyEnabled = true;
+            return true;
+        }
+        return setCharacteristicNotification(bluetoothGatt, arrayNtfCharList.get(notifyCharIndex++),
+                EnableNotifyChara);
+    }
+
+    private static boolean writeValue(BluetoothGatt bluetoothGatt, BluetoothGattCharacteristic
+            writeCharacteristic, byte[] qppData) {
+        if (bluetoothGatt == null) {
+             Log.e(TAG, "--> BluetoothAdapter not initialized");
+            return false;
+        }
+        if (qppData == null) {
+            Log.e(TAG, "--> qppData is null.");
+            return false;
+        }
+        qppData = deleteSpace(qppData);
+        if (CheckHex) {
+            qppData = textAscII2Hex(qppData);
+        }
+        writeCharacteristic.setValue(qppData);
+        return bluetoothGatt.writeCharacteristic(writeCharacteristic);
+    }
+
+    private static byte[] textAscII2Hex(byte[] qppData) {
+        byte[] mBytes = deleteSpace(qppData);
+        int len = mBytes.length >> 1;
+        if (qppData.length == 0) {
+            Log.e(TAG, "--> qppData.length = 0.");
+            return null;
+        }
+        chenkInputString(qppData);
+        byte[] dataArr = new byte[len];
+        for (int i = 0; i < len; i++) {
+            int strPos = i * 2;
+            dataArr[i] = (byte) (charToByte(mBytes[strPos]) << 4 | charToByte(mBytes[strPos + 1]));
+
+        }
+        return dataArr;
+    }
+
+    private static int charToByte(byte b) {
+        if(b >= 48 && b <= 57) {
+            b = (byte) (b - 48);
+        }else if(b >= 65 && b <= 90) {
+            b = (byte) (b - 55);
+        }else if(b >= 97 && b <= 122) {
+            b = (byte) (b - 87);
+        }
+        return b;
     }
 
 
